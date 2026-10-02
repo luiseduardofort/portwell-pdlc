@@ -42,3 +42,12 @@ gate: null
 why_this_state: >
   Trace step 18, checklist row 5: "Per-account enablement implemented, No, In the design, not
   built." The pilot was extended to 28 accounts on 2026-08-07 with the enabling mechanism not built.
+
+# Read by lib/validate_gate.py. signed_sections are hashed into the signed record, so editing
+# them after signing voids it. exit_checks are deterministic and run on every exit.
+exit_control:
+  signed_sections: [build_record]
+  exit_checks:
+    - {present: build_record.declared_ready.person, because: engineering declared the build ready}
+    - {present: build_record.declared_ready.date, because: engineering declared the build ready}
+    - {forbid_where: [build_record.deviations, {needs_g2: true}], because: no deviation needing G2 may remain open}

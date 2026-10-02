@@ -1,0 +1,32 @@
+# The trust anchor of the lifecycle guard. Nothing that runs on a developer's machine can be
+# trusted: a shell write, a disabled hook or a changed settings file all bypass local controls.
+# This job runs on the server. Make it a required status check in the branch protection of main.
+name: lifecycle-guard
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+      - name: Regression tests
+        run: python3 -m unittest discover tests
+      - name: Every artifact is valid
+        run: python3 lib/validate_gate.py --all
+      - name: Changes are append-only, signed and consented
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base=$(git merge-base "origin/${{ github.base_ref }}" HEAD)
+          else
+            base="${{ github.event.before }}"
+          fi
+          python3 lib/validate_gate.py --base "$base"

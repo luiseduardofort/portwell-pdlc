@@ -39,3 +39,15 @@ gate: null
 why_this_state: >
   Trace step 11 and docs/Dependencies.docx. DECISION-0028 cited "Verbal confirmation from
   engineering that capacity is available." Engineering estimates arrive "verbally."
+
+# Read by lib/validate_gate.py. signed_sections are hashed into the signed record, so editing
+# them after signing voids it. exit_checks are deterministic and run on every exit.
+exit_control:
+  signed_sections: [engineering_acceptance]
+  exit_checks:
+    - {present: engineering_acceptance.accepted.person, because: engineering accepted in writing}
+    - {present: engineering_acceptance.accepted.statement, because: engineering accepted in writing}
+    - {present: engineering_acceptance.accepted.date, because: engineering accepted in writing}
+    - {present: engineering_acceptance.estimate.written_by, because: the estimate must be written}
+    - {present: engineering_acceptance.estimate.dated, because: the estimate must be dated}
+    - {blank: engineering_acceptance.estimate.verbal, because: a verbal estimate does not satisfy exit}

@@ -1,0 +1,9 @@
+# Review is required from a person for every path that decides what the guard trusts.
+# Proposed owner: the repository owner. Replace with the group's lifecycle owner and the policy owners.
+/governance/                 @luiseduardofort
+/lifecycle/**/*.signature.yaml @luiseduardofort
+/lib/                        @luiseduardofort
+/states/                     @luiseduardofort
+/.claude/                    @luiseduardofort
+/.github/                    @luiseduardofort
+/hooks/                      @luiseduardofort

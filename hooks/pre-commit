@@ -1,0 +1,3 @@
+#!/bin/sh
+# Harness-independent copy of the guard. Install: ln -sf ../../hooks/pre-commit .git/hooks/pre-commit
+exec python3 "$(git rev-parse --show-toplevel)/lib/validate_gate.py" --base HEAD

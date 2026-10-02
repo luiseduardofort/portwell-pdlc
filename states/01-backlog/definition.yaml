@@ -45,3 +45,9 @@ gate:
 why_this_state: >
   Trace step 1. The expansion began as a conversation between Gabriela Rocha and Ana Fialho with
   no date and no record. Nothing bounded it before the brief was written on 2026-06-18.
+
+# Read by lib/validate_gate.py. signed_sections are hashed into the signed record, so editing
+# them after signing voids it. exit_checks are deterministic and run on every exit.
+exit_control:
+  signed_sections: [gate.pack, gate.consents]
+  exit_checks: []
