@@ -32,3 +32,12 @@ gate: null
 why_this_state: >
   Trace step 16. Rui Bastos, 2026-08-19: "a suggestion that needs a human to read it before it
   goes out has not saved anyone anything, it has moved the work." Released is not done.
+
+# Read by lib/validate_gate.py. signed_sections are hashed into the signed record, so editing
+# them after signing voids it. exit_checks are deterministic and run on every exit.
+exit_control:
+  signed_sections: [closure]
+  exit_checks:
+    - {present: closure.closed.person, because: closure is written by a person}
+    - {present: closure.closed.date, because: closure is dated}
+    - {each_present: [closure.remaining_monitoring, owned_by_item], because: every remaining measure has an owning item}

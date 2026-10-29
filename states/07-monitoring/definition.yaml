@@ -56,3 +56,9 @@ why_this_state: >
   Trace steps 6, 9, 16 and 17. Two incidents were closed with no follow-up owner. The measure
   support asked for has "Not measured" as its source. Whether the incidents should block the
   expansion was a question "Nobody has been asked to decide."
+
+# Read by lib/validate_gate.py. signed_sections are hashed into the signed record, so editing
+# them after signing voids it. exit_checks are deterministic and run on every exit.
+exit_control:
+  signed_sections: [gate.pack, gate.consents]
+  exit_checks: []

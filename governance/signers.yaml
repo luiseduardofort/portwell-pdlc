@@ -1,0 +1,12 @@
+# Who may sign, and under which SSH principal. Enrolled by a person, reviewed through CODEOWNERS.
+# A signer is valid only if the principal below also has a key in allowed_signers, and the stage
+# definition names that person as the decider (gates) or owner (other exits).
+#
+# Enrol, outside any agent session:
+#   1. The person sends their SSH public key. Never a private key.
+#   2. Add the entry here: person (as in data/people/headcount.xlsx), role, principal.
+#   3. Add one line to allowed_signers:
+#        <principal> namespaces="portwell-gate" <public key>
+#
+# Nobody is enrolled yet, so no exit can be signed and every exit is refused. That is intended.
+signers: []

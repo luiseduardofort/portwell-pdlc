@@ -1,0 +1,3 @@
+# OpenSSH allowed_signers. One line per enrolled key:
+#   <principal> namespaces="portwell-gate" ssh-ed25519 AAAA...
+# Empty on purpose. See signers.yaml.

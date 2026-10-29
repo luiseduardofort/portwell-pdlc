@@ -23,7 +23,7 @@ exit_conditions:
 owner: {role: product lead, person: Ana Fialho, note: row owners are accountable for their rows}
 
 allowed_transitions:
-  - {to: 06-release, when: G3 signed with a wave plan}
+  - {to: 06-release, outcome: release, when: G3 signed with a wave plan}
   - {to: 05-review, status: correction-required, when: a row fails, return_to 04-in-development or 02-discovery}
   - {to: 05-review, status: blocked, when: a regional or area consent is pending}
 
@@ -62,3 +62,11 @@ why_this_state: >
   Trace step 18. The checklist of 2026-08-26 had rows 1, 2 and 8 at Yes with no evidence, row 4
   citing a file that does not exist, row 6 checking POLICY-10 after it was superseded on
   2026-07-01, and row 7 calling an adjusted threshold pre-registered.
+
+# Read by lib/validate_gate.py. signed_sections are hashed into the signed record, so editing
+# them after signing voids it. exit_checks are deterministic and run on every exit.
+exit_control:
+  signed_sections: [gate.pack, gate.consents, gate.waves]
+  exit_checks:
+    - {equals: [verification_v2.outcome, passed], only_if_advancing: true, because: exit condition 3}
+    - {forbid_where: [readiness_checklist, {status: yes-without-evidence}], only_if_advancing: true, because: no row may read yes without an evidence link}

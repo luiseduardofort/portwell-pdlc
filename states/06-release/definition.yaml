@@ -39,3 +39,12 @@ gate: null
 why_this_state: >
   Trace step 11 and 19. DECISION-0028 extended the pilot to 28 accounts. Whether those accounts
   are enabled today is not recorded anywhere in the repository.
+
+# Read by lib/validate_gate.py. signed_sections are hashed into the signed record, so editing
+# them after signing voids it. exit_checks are deterministic and run on every exit.
+exit_control:
+  signed_sections: [release_log]
+  exit_checks:
+    - {last_present: [release_log, confirmed.person], because: the wave is confirmed by engineering}
+    - {last_present: [release_log, confirmed.date], because: the wave is confirmed by engineering}
+    - {last_equals: [release_log, matches_g3_wave, true], because: enabled scope must match the G3 wave}

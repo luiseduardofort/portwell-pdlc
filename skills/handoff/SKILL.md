@@ -50,8 +50,11 @@ Any gate field. Any section of the next artifact beyond what intake writes. Any 
    matches, refuse and report the mismatch to the stage owner.
 3. For a terminal outcome, reject or retire: set `status` accordingly, `exited_to: terminal`,
    append the status line with the signature's date and person, and end. No next artifact.
-4. For a move: set `exited` today, `exited_to` the next stage, `status: exited`, append the
-   status line "exited on <gate> outcome <outcome>".
+4. For a move: run `python3 lib/lifecycle.py advance <item> <stage>`. It reads the signed record
+   `lifecycle/<stage>/<item>.signature.yaml`, runs the guard, and only then writes `exited`,
+   `exited_to`, `status: exited` and the status line. Do not edit those fields by hand: the hook
+   refuses it. If the command exits 2, relay its message and stop. The signature file is written
+   only by the named person with `lib/sign_gate.py`. This skill never runs it.
 5. Invoke intake for `item` in the next stage. Intake fills the entry ticket from this gate.
 6. For a G4 outcome `iterate`: the new item needs an ID from the product repository. Write the
    proposed item under `gate.spawned_item` with `links.spawned_by` set, and stop for the ID. Do

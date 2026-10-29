@@ -1,0 +1,31 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/lib/validate_gate.py\" --hook"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "deny": [
+      "Edit(/governance/**)",
+      "Edit(/lifecycle/**/*.signature.yaml)"
+    ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "filesystem": {
+      "denyWrite": [
+        "./governance",
+        "./lifecycle/**/*.signature.yaml"
+      ]
+    },
+    "excludedCommands": ["git *", "gh *"]
+  }
+}
