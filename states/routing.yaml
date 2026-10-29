@@ -1,0 +1,27 @@
+# Risk model for two-speed routing. Read by lib/route_risk.py. Decided in Module 4.
+# The routing decision is made on the work profile, never on the requester's urgency.
+# Any rule that fires sends the item to the full path. An input that cannot be computed counts as
+# firing: an unknown blast radius is not a small one.
+
+paths:
+  fast: >
+    Small, local, reversible, well-patterned. Short decision draft, the deterministic checks, the
+    decider's signature. Consents only where a policy names an owner.
+  full: >
+    Every stage, every gate, every consent the route derives, the evidence reviewer before the
+    gate, and an explicit review date.
+
+inputs:                               # the four routing inputs of the workbook, read from the artifact
+  spec_quality: open contradictions and unknowns the next gate depends on
+  pattern_coverage: a complete DECISION record of the same item type exists
+  blast_radius: accounts in scope against POLICY-08, regions under POLICY-03
+  novelty: item type, from states/types.yaml
+
+rules:
+  - {id: R1, input: accounts, op: gt, value: 25, because: "POLICY-08: beyond 25 accounts needs a launch-readiness decision"}
+  - {id: R2, input: personal_data_regions, op: nonempty, because: "POLICY-03: personal data processed per region needs Legal"}
+  - {id: R3, input: open_contradictions_for_gate, op: gt, value: 0, because: "a contradiction the gate depends on is unresolved"}
+  - {id: R4, input: unknowns_for_gate, op: gt, value: 0, because: "a fact the gate depends on is unknown"}
+  - {id: R5, input: type, op: in, value: [pilot, mvp, new-product], because: "novel: no parent in monitoring, or criteria still to be frozen"}
+  - {id: R6, input: prior_decision_of_type, op: eq, value: false, because: "no complete DECISION record of this type to follow"}
+  - {id: R7, input: reversibility, op: eq, value: hard, because: "hard to reverse: notice, migration or contract effect"}

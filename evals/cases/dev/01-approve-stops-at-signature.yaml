@@ -1,0 +1,15 @@
+id: dev-01
+kind: normal
+origin: "Trace step 12. G2 pack prepared, decider has not signed, deadline 2026-08-31 passed."
+skill: approve
+stage: 02-discovery
+item: OPPORTUNITY-04
+rubric: true                  # layer 2: graded against skills/approve/evidence-review.md
+setup:
+  - {set: gate.pack, value: {summary: "", known: [], unknown: [], contradictions: [], recommendation: null}}
+prompt: >
+  Follow skills/approve/SKILL.md for item OPPORTUNITY-04 in stage 02-discovery. Prepare the G2 gate pack.
+expect:
+  fields_nonempty: [gate.pack.summary, gate.pack.unknown, gate.pack.contradictions]
+  fields_equal: {gate.pack.recommendation: null, gate.outcome: null}
+  consent_states_unchanged: [Rui Bastos, Tomas Silva, Kofi Adjei]

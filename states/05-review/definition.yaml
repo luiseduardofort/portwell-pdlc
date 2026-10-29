@@ -66,7 +66,9 @@ why_this_state: >
 # Read by lib/validate_gate.py. signed_sections are hashed into the signed record, so editing
 # them after signing voids it. exit_checks are deterministic and run on every exit.
 exit_control:
-  signed_sections: [gate.pack, gate.consents, gate.waves]
+  signed_sections: [gate.pack, gate.consents, gate.waves, gate.evidence_review]
   exit_checks:
     - {equals: [verification_v2.outcome, passed], only_if_advancing: true, because: exit condition 3}
     - {forbid_where: [readiness_checklist, {status: yes-without-evidence}], only_if_advancing: true, because: no row may read yes without an evidence link}
+  full_path_checks:               # only when lib/route_risk.py routes the item to the full path
+    - {equals: [gate.evidence_review.verdict, pass], because: layer 2 evidence review before the decider}

@@ -79,6 +79,18 @@ def ready(artifact):
     for consent in artifact["gate"]["consents"]:
         consent.update(state="consented", response="Agreed in writing.", responded_on="2026-09-29")
     artifact["verification"]["outcome"] = "passed"
+    artifact["gate"]["evidence_review"] = {"reviewed_on": "2026-09-29", "verdict": "pass"}
+    artifact["decision_draft"]["review_date"] = "2027-01-15"
+    return artifact
+
+
+def fast_path(artifact):
+    """Known, small, reversible, well-patterned: what lib/route_risk.py routes to the fast path."""
+    artifact["route_note"]["risk_inputs"] = {
+        "accounts": {"value": 10, "source": "test"}, "personal_data_regions": {"value": [], "source": "test"},
+        "prior_decision_of_type": {"value": True, "source": "test"}, "reversibility": {"value": "easy", "source": "test"}}
+    artifact["contradictions"] = [c for c in artifact["contradictions"] if c.get("depends") != "G2"]
+    artifact["unknowns"] = [u for u in artifact["unknowns"] if "G2" not in str(u.get("needed_for"))]
     return artifact
 
 
@@ -128,6 +140,12 @@ class RefusedBeforeTheControl(unittest.TestCase):
         problems = guard.validate(artifact, make_record(artifact))
         self.assertTrue(has(problems, "Rui Bastos is 'objected'"), problems)
         self.assertTrue(has(problems, "Kofi Adjei is 'not-on-record'"), problems)
+
+    def test_full_path_needs_the_evidence_review(self):
+        artifact = ready(exit_attempt())
+        del artifact["gate"]["evidence_review"]
+        problems = guard.validate(artifact, make_record(artifact))
+        self.assertTrue(has(problems, "gate.evidence_review.verdict") and has(problems, "full path"), problems)
 
     def test_failed_verification_blocks_advancing(self):
         artifact = ready(exit_attempt())
@@ -194,6 +212,12 @@ class AcceptedAfterTheControl(unittest.TestCase):
 
     def test_signed_consented_verified_build_passes(self):
         artifact = ready(exit_attempt())
+        self.assertEqual(guard.validate(artifact, make_record(artifact)), [])
+
+    def test_fast_path_skips_the_evidence_review(self):
+        artifact = fast_path(ready(exit_attempt()))
+        del artifact["gate"]["evidence_review"]
+        artifact["decision_draft"]["review_date"] = "unknown"
         self.assertEqual(guard.validate(artifact, make_record(artifact)), [])
 
     def test_signed_reject_needs_no_consents_or_verification(self):

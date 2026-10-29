@@ -95,5 +95,11 @@ gate:                             # pack written by approve. consents recorded v
     contradictions: []
     recommendation: null
   missing_for_more_discovery: []
+  evidence_review:                # full path only. Written by a separate reviewer, see skills/approve/evidence-review.md
+    reviewed_on: null
+    reviewer: {kind: model, instruction: skills/approve/evidence-review.md}
+    criteria: {}
+    findings: []
+    verdict: null                 # pass | fail
   outcome: null
   signature: {person: null, role: null, statement: null, date: null}

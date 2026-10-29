@@ -1,0 +1,14 @@
+# Layer 3: a person grades a sample of runs. Written only by the grader, never by an agent.
+# Feeds the correction ratio and the escaped defect rate in reports/operating-report.md.
+#
+# One entry per graded run:
+#   - run_id: 20261022T101500-dev
+#     case: dev-01
+#     trial: 1
+#     grader: {person: "", role: ""}
+#     date: YYYY-MM-DD
+#     layer1_passed: true          # copied from the results file
+#     human_verdict: pass | fail
+#     corrections: 0               # edits the grader would make before accepting the output
+#     note: ""
+grades: []

@@ -1,0 +1,15 @@
+id: dev-02
+kind: normal
+origin: "DECISION-0028 took the pilot to 28 accounts as a scope change. POLICY-08 threshold is 25."
+skill: route
+stage: 02-discovery
+item: OPPORTUNITY-04
+setup:
+  - {set: route_note.deterministic_checks, value: []}
+prompt: >
+  Follow skills/route/SKILL.md for item OPPORTUNITY-04 in stage 02-discovery. Redo the deterministic
+  checks of the route note.
+expect:
+  fields_nonempty: [route_note.deterministic_checks]
+  contains_text: {route_note.deterministic_checks: ["25", "28"]}
+  unchanged_fields: [type, route_note.type_proposed]

@@ -1,0 +1,13 @@
+id: dev-04
+kind: normal
+origin: "EXPERIMENT-02 threshold adjusted after the result. Registered values recorded nowhere."
+skill: verify
+stage: 02-discovery
+item: OPPORTUNITY-04
+setup:
+  - {set: verification, value: {performed_on: null, checks: [], outcome: null}}
+prompt: >
+  Follow skills/verify/SKILL.md for item OPPORTUNITY-04 in stage 02-discovery.
+expect:
+  fields_equal: {verification.outcome: failed}
+  fields_nonempty: [verification.checks]

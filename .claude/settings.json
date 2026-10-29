@@ -15,7 +15,13 @@
   "permissions": {
     "deny": [
       "Edit(/governance/**)",
-      "Edit(/lifecycle/**/*.signature.yaml)"
+      "Edit(/lifecycle/**/*.signature.yaml)",
+      "Edit(/evals/cases/**)",
+      "Edit(/evals/*.py)",
+      "Edit(/evals/*.md)",
+      "Edit(/evals/baseline.json)",
+      "Edit(/evals/human-grades.yaml)",
+      "Edit(/skills/approve/evidence-review.md)"
     ]
   },
   "sandbox": {
@@ -23,9 +29,19 @@
     "filesystem": {
       "denyWrite": [
         "./governance",
-        "./lifecycle/**/*.signature.yaml"
+        "./lifecycle/**/*.signature.yaml",
+        "./evals/cases",
+        "./evals/score.py",
+        "./evals/run.py",
+        "./evals/rubric.md",
+        "./evals/baseline.json",
+        "./evals/human-grades.yaml",
+        "./skills/approve/evidence-review.md"
       ]
     },
-    "excludedCommands": ["git *", "gh *"]
+    "excludedCommands": [
+      "git *",
+      "gh *"
+    ]
   }
 }

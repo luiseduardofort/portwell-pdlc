@@ -32,7 +32,8 @@ in 05-review for `policy_check` and the wave plan.
 
 ## Writes
 `route_note` in 02-discovery: `type_proposed`, `type_rationale`, `policies_triggered`,
-`deterministic_checks`, `signatories_g2`, `signatories_g3`, `waves_proposed`. `policy_check` in
+`deterministic_checks`, `signatories_g2`, `signatories_g3`, `waves_proposed`, `risk_inputs`,
+`path`. `policy_check` in
 05-review. `opportunity.type_hypothesis` in 01-backlog.
 
 ## Never writes
@@ -65,7 +66,12 @@ in 05-review for `policy_check` and the wave plan.
    accounts, regions and a `go_criteria` that must come from a registered measure.
 6. In 05-review, write `policy_check` for every policy the checklist or the draft cites:
    `current`, `superseded_by`, `applies`, `owner`.
-7. Propose the next skill in the sequence.
+7. Path. Write `route_note.risk_inputs`: `accounts`, `personal_data_regions`,
+   `prior_decision_of_type` and `reversibility`, each as `{value, source}` or `unknown`. Then run
+   `python3 lib/route_risk.py lifecycle/<stage>/<item>.yaml --gate <next gate>` and copy its `path`
+   and `fired` rules into `route_note.path` verbatim. The path is decided by `states/routing.yaml`,
+   not by this skill. An unknown input fires its rule.
+8. Propose the next skill in the sequence.
 
 ## Evidence produced
 A route note a reader can audit line by line: this type because these facts, these policies

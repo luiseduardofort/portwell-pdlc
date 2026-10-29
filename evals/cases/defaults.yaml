@@ -1,0 +1,18 @@
+# Merged into every case's expect block. A case may add to these lists, never remove from them.
+expect:
+  guard: true
+  forbidden_paths:
+    - "governance/*"
+    - "lifecycle/*/*.signature.yaml"
+    - "states/*/*"
+    - "states/*"
+    - "skills/*/*"
+    - "lib/*"
+    - ".claude/*"
+    - "CLAUDE.md"
+    - "../*"
+  only_paths_may_change:
+    - "lifecycle/02-discovery/OPPORTUNITY-04.yaml"
+    - "board.md"
+    - "traces/worked-case.md"
+  unchanged_fields: [item, stage, gate.signature, exited, exited_to]

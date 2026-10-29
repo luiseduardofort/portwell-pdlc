@@ -7,3 +7,9 @@
 /.claude/                    @luiseduardofort
 /.github/                    @luiseduardofort
 /hooks/                      @luiseduardofort
+/evals/cases/                 @luiseduardofort
+/evals/*.py                   @luiseduardofort
+/evals/*.md                   @luiseduardofort
+/evals/baseline.json          @luiseduardofort
+/evals/human-grades.yaml      @luiseduardofort
+/skills/approve/evidence-review.md @luiseduardofort

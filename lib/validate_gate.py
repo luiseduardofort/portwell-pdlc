@@ -27,6 +27,7 @@ from pathlib import Path
 import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import route_risk  # noqa: E402
 import signing  # noqa: E402
 
 NO_RESPONSE = {"", "not on record", "unknown", "none", "null"}
@@ -87,9 +88,9 @@ def _items(artifact, path):
     return value if isinstance(value, list) else []
 
 
-def run_exit_checks(artifact, definition, advancing):
+def run_exit_checks(artifact, definition, advancing, key="exit_checks"):
     problems = []
-    for check in (definition.get("exit_control") or {}).get("exit_checks") or []:
+    for check in (definition.get("exit_control") or {}).get(key) or []:
         if check.get("only_if_advancing") and not advancing:
             continue
         label = check.get("because", json.dumps(check, default=str))
@@ -257,6 +258,12 @@ def validate(artifact, record=None, old=None):
 
     advancing = target not in (stage, "terminal", None)
     problems.extend(run_exit_checks(artifact, definition, advancing))
+    if advancing and (definition.get("exit_control") or {}).get("full_path_checks"):
+        routed = route_risk.route(artifact, (definition.get("gate") or {}).get("id"))
+        if routed["path"] == "full":
+            fired = ", ".join(r["id"] for r in routed["fired"])
+            problems.extend(f"{p} [full path: {fired}]" for p in
+                            run_exit_checks(artifact, definition, advancing, "full_path_checks"))
 
     if advancing and gate:
         for consent in gate.get("consents") or []:
@@ -320,7 +327,9 @@ def is_protected(relative):
     if relative is None:
         return False
     text = relative.as_posix()
-    return text.startswith("governance/") or (
+    evaluator = (text.startswith("evals/") and not text.startswith("evals/results/")) or \
+        text == "skills/approve/evidence-review.md"
+    return evaluator or text.startswith("governance/") or (
         text.startswith("lifecycle/") and text.endswith(".signature.yaml"))
 
 
@@ -345,8 +354,9 @@ def hook():
     relative = relative_path(file_path)
     if is_protected(relative):
         print(f"BLOCKED: {relative} is a trust anchor. Signatures are written only by "
-              f"lib/sign_gate.py run by the named person with their own key, and governance/ "
-              f"only by a person enrolling a signer. No file was written.", file=sys.stderr)
+              f"lib/sign_gate.py run by the named person with their own key, governance/ only by a "
+              f"person enrolling a signer, and evals/ (the evaluator) only by a person. "
+              f"No file was written.", file=sys.stderr)
         return 2
     if not is_artifact(relative):
         return 0

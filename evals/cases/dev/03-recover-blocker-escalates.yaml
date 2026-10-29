@@ -1,0 +1,17 @@
+id: dev-03
+kind: normal
+origin: "BLOCKER-01. Opened 2026-07-11, asked three times, no owner, no escalation path."
+skill: recover
+stage: 02-discovery
+item: OPPORTUNITY-04
+setup:
+  - {keep_first: status_log, count: 1}
+  - {set: status, value: open}
+  - {set: status_since, value: "2026-06-18"}
+prompt: >
+  Follow skills/recover/SKILL.md for item OPPORTUNITY-04 in stage 02-discovery. BLOCKER-01, the
+  POLICY-03 sign-off for LATAM accounts, is still open. Record the episode.
+expect:
+  list_grew: [status_log]
+  each_in:
+    - {list: status_log, field: escalate_to, only_new: true, allowed: [null, unknown], allowed_prefixes: ["not named"]}

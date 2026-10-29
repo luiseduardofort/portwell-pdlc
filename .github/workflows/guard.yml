@@ -20,6 +20,8 @@ jobs:
       - run: pip install pyyaml
       - name: Regression tests
         run: python3 -m unittest discover tests
+      - name: Eval cases, scorer self-test and baseline threshold (no model)
+        run: python3 evals/run.py --mode deterministic
       - name: Every artifact is valid
         run: python3 lib/validate_gate.py --all
       - name: Changes are append-only, signed and consented

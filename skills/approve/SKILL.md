@@ -54,12 +54,17 @@ which stays null.
 3. Pack. `summary` is one paragraph: what is being decided, for whom, with what scope. `known` is
    a list of manifest IDs with their values. `unknown` copies `unknowns`. `contradictions` copies
    the entries whose `depends` is this gate. `recommendation` is null.
-4. Deadline. Copy the deadline the previous gate set or a request on record states, with its
+4. Evidence review, full path only. Run `python3 lib/route_risk.py lifecycle/<stage>/<item>.yaml
+   --gate <gate>`. If the path is `full`, have a separate reviewer apply
+   `skills/approve/evidence-review.md` to the artifact and write its result, verbatim, under
+   `gate.evidence_review`. Never review your own pack. A `fail` verdict returns the pack to step 3
+   with the findings. The guard refuses a full-path exit without `verdict: pass`.
+5. Deadline. Copy the deadline the previous gate set or a request on record states, with its
    source. If today is past it and `signature.date` is null, propose `blocked` through recover
    with reason "awaiting decision", waiting on the decider.
-5. Stop. Write in the trace the question the decider must answer and the options. End the skill.
+6. Stop. Write in the trace the question the decider must answer and the options. End the skill.
    The signature, if it comes, is written by the person into `gate.signature` with `outcome`.
-6. When a signature exists, do nothing more. Handoff reads the outcome.
+7. When a signature exists, do nothing more. Handoff reads the outcome.
 
 ## Evidence produced
 A gate block in which a reader sees, without asking anyone, what the decider was shown, who had
