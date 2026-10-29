@@ -15,8 +15,7 @@ relatório operacional. Ele lê o repositório `portwell-product` como fonte de 
 escreve.
 
 Estado documentado: branch `main`, commit `90e5325`, 2026-10-29. Onde este texto diz "verificado",
-a verificação foi feita nessa data e está registrada em
-[`reviews/architecture-review-2026-10-29.md`](reviews/architecture-review-2026-10-29.md).
+a verificação foi feita nessa data, nesse commit, por execução ou teste.
 
 ## Índice
 
@@ -51,7 +50,7 @@ a verificação foi feita nessa data e está registrada em
 
 - Para entender a arquitetura em quinze minutos: seções 2, 3 e 6, mais os diagramas 1, 3 e 5.
 - Para operar o sistema: seções 9 e 7, depois a seção 4 como exemplo.
-- Para contribuir com código: seções 5, 6 e 8, e a revisão em `reviews/`.
+- Para contribuir com código: seções 5, 6, 8 e 11.
 
 **Categorias usadas nas afirmações sobre controles.**
 
@@ -575,21 +574,21 @@ eval rodam com `--tools Read,Edit,Write`, sem MCP, sem persistência, com orçam
 
 | Invariante | Controle | Onde atua | O que garante | O que não garante | Evidência / status |
 | :- | :- | :- | :- | :- | :- |
-| Um exit só existe com decisão de pessoa | Registro assinado + guard + `advance` | hook, `advance`, CI | Nenhum exit sem assinatura válida da pessoa nomeada no contrato, com as seções assinadas intactas | Que a pessoa leu um pack verdadeiro; que a allowlist não foi alterada no mesmo PR | Implementado. Verificado por 13 testes de recusa e pelo CI; a cadeia de forjamento via `governance/` passa (revisão, F-02) |
+| Um exit só existe com decisão de pessoa | Registro assinado + guard + `advance` | hook, `advance`, CI | Nenhum exit sem assinatura válida da pessoa nomeada no contrato, com as seções assinadas intactas | Que a pessoa leu um pack verdadeiro; que a allowlist não foi alterada no mesmo PR | Implementado. Verificado por 13 testes de recusa e pelo CI; a cadeia de forjamento via `governance/` passa (verificado em cópia isolada) |
 | `gate.signature` não é preenchido sem registro | guard | hook, CI | Bloco informativo coerente com o registro | Nada além disso | Implementado, verificado por teste |
-| Aprovação vinculada à versão aprovada | `sections_sha256` | guard | `gate.pack`, `gate.consents`, `gate.evidence_review` não mudam após a assinatura | `decision_draft`, manifesto, contradições, `risk_inputs` podem mudar | Implementado para as seções listadas. Verificado: alteração fora delas passa (revisão, F-03) |
+| Aprovação vinculada à versão aprovada | `sections_sha256` | guard | `gate.pack`, `gate.consents`, `gate.evidence_review` não mudam após a assinatura | `decision_draft`, manifesto, contradições, `risk_inputs` podem mudar | Implementado para as seções listadas. Verificado: alteração fora delas passa (cópia isolada) |
 | Registro assinado imutável após commit | CI `check_since` | CI | Modificação ou remoção do `.signature.yaml` falha o check | Nada se o check não for obrigatório | Implementado. Pendente de configuração (branch protection) |
 | `governance/` só por pessoa | `permissions.deny`, hook, sandbox, CODEOWNERS | hook, permissões, CI | `Write`/`Edit` do agente são negados (verificado nesta máquina) | Escrita pelo shell no Windows; PR sem review | Parcialmente verificado. Sandbox: não aplicável no Windows (documentação oficial) |
-| Consentimento só com resposta datada | guard | hook, CI | `state: consented` tem texto e data | Que o texto é da pessoa; que uma objeção não foi virada pelo modelo | Implementado. Verificado: flip com palavras inventadas passa (revisão, F-04) |
+| Consentimento só com resposta datada | guard | hook, CI | `state: consented` tem texto e data | Que o texto é da pessoa; que uma objeção não foi virada pelo modelo | Implementado. Verificado: flip com palavras inventadas passa (payload enviado ao hook) |
 | Objeção fechada só pelo objetor | skill approve, recover | nenhum ponto executável | Nada em tempo de escrita | Tudo | Prosa. Medido por `dev-06` no eval, nunca executado live |
 | Contradição resolvida só por pessoa | skill context | nenhum | Nada em tempo de escrita | Tudo | Prosa. Medido por `dev-07`, `ho-02` |
 | Unknown nunca estimado | skills | nenhum | Nada em tempo de escrita | Tudo | Prosa. Medido por `dev-07`, `ho-03` |
-| Verificação aprovada antes de avançar | `exit_checks` | guard | `verification.outcome == passed` ao avançar | Coerência com `checks[].result` | Implementado. Verificado: `passed` com checks em `fail` passa (revisão, F-04) |
+| Verificação aprovada antes de avançar | `exit_checks` | guard | `verification.outcome == passed` ao avançar | Coerência com `checks[].result` | Implementado. Verificado: `passed` com checks em `fail` passa (payload enviado ao hook) |
 | Revisão de evidência antes do decisor no caminho `full` | `full_path_checks` + `route_risk` | guard | `gate.evidence_review.verdict == pass` presente | Que um revisor separado escreveu | Implementado. Verificado: a mesma sessão pode escrever `pass` |
 | Rota por perfil, não por urgência | `routing.yaml` + `route_risk.py` | skill route, guard | Regras disparam por valor ou por `unknown` | Que `risk_inputs` declarados batem com a fonte | Implementado, verificado por teste |
-| Histórico append-only | guard | hook, CI | Header, `status_log`, `sources` não reescritos | Escrita pelo shell sem CI obrigatório; `advance` repetido reescreve `exited` | Implementado. Verificado, com a exceção do writer (revisão, F-06) |
+| Histórico append-only | guard | hook, CI | Header, `status_log`, `sources` não reescritos | Escrita pelo shell sem CI obrigatório; `advance` repetido reescreve `exited` | Implementado. Verificado, com a exceção do writer (cópia isolada) |
 | Mudança de status exige linha de log | guard | hook, CI | Uma linha nova existe | Conteúdo da linha (limite, alvo, retorno) | Implementado, verificado |
-| Hook impede edição direta de exit | hook | runtime | Recusa quando o hook roda e devolve 2 | Nada se o hook não iniciar, sair com 1 ou expirar (não bloqueante por padrão na documentação de Claude Code) | Implementado. **Não verificado no runtime**: na sessão de revisão uma edição direta de `exited_to` foi aceita |
+| Hook impede edição direta de exit | hook | runtime | Recusa quando o hook roda e devolve 2 | Nada se o hook não iniciar, sair com 1 ou expirar (não bloqueante por padrão na documentação de Claude Code) | Implementado. **Não verificado no runtime**: em uma sessão de Claude Code em 2026-10-29 uma edição direta de `exited_to` foi aceita |
 | Repositório de contexto nunca escrito | skills; `forbidden_paths` no eval | scorer | Detectado no eval | Nada no lifecycle real | Prosa no lifecycle, executável só no eval |
 | Avaliador não editável pelo agente | hook, `permissions.deny`, cópia sem `evals/` | hook, runner | Negado para as ferramentas de edição; invisível na cópia de eval | Escrita pelo shell no Windows | Implementado, verificado por teste do hook |
 
@@ -638,7 +637,7 @@ interna chama de "âncora de confiança" é o CI, e ela ainda não está ligada.
 | Assinatura inválida | Pessoa errada, não matriculada, statement adulterado, seções assinadas alteradas: exit 2 | Executável, verificado por teste |
 | Transição proibida | `exited_to` diferente do que o outcome permite, ou outcome que mantém o item no estágio: exit 2 | Executável, verificado por teste |
 | Falha interna do validador | Exceção Python, YAML corrompido, definição quebrada, stdin inválido: exit 2 com "refuses by default" | Executável, verificado por teste |
-| Falha de lançamento do hook | Comando não encontrado, variável não expandida, exit 1, timeout: a ferramenta prossegue. Claude Code só bloqueia em exit 2 ou com `onFailure: "block"`, que não está configurado | Comportamento do runtime; a edição direta foi aceita na sessão de revisão |
+| Falha de lançamento do hook | Comando não encontrado, variável não expandida, exit 1, timeout: a ferramenta prossegue. Claude Code só bloqueia em exit 2 ou com `onFailure: "block"`, que não está configurado | Comportamento do runtime; a edição direta foi aceita em uma sessão de Claude Code em 2026-10-29 |
 | Retry de `advance` | Segunda execução grava de novo: reescreve `exited` e adiciona outra linha `exited` em `status_log` | Verificado em cópia isolada; não idempotente |
 | Retomada após interrupção | A escrita usa arquivo temporário e `os.replace`; o artefato nunca fica meio escrito; um `.tmp` órfão pode sobrar na pasta | Executável, lido no código |
 | Concorrência | Sem lock. Duas execuções leem o mesmo estado, ambas validam, a última grava por cima | Inferido do código |
@@ -867,18 +866,17 @@ Feita por quem administra o repositório, não pelo código. Pendente em 2026-10
 | [`reports/operating-report.md`](reports/operating-report.md) | Gerado por `measures.py`; não editar à mão | Para ver o que está esperando por quem |
 | [`lifecycle.md`](lifecycle.md) | Processo atual traçado e a planilha do lifecycle proposto (tabelas to-be ainda em TODO) | Para o histórico do processo como praticado |
 | [`board.md`](board.md) | Visão das colunas, mantida por `handoff` | Leitura |
-| [`reviews/`](reviews/) | Revisão de arquitetura de 2026-10-29 | Para os achados detalhados, cenários de falha executados e o plano de ação |
 | [`docs/`](docs/) | Enunciado original do Módulo 1 | Histórico |
 
 ## 11. Limitações e evolução
 
-As limitações abaixo vêm da revisão de 2026-10-29, feita sobre o mesmo commit que este README
-descreve. Nenhuma delas foi corrigida até a data desta página. Detalhes, evidências e o plano
-P0/P1/P2 estão em [`reviews/architecture-review-2026-10-29.md`](reviews/architecture-review-2026-10-29.md).
+As limitações abaixo foram verificadas em 2026-10-29 sobre o mesmo commit que este README
+descreve. Nenhuma delas foi corrigida até a data desta página. A coluna da direita é proposta,
+não implementada.
 
 | Tema | Estado em `90e5325` | Evolução proposta (não implementada) |
 | :- | :- | :- |
-| Ativação do hook | Configurado. Na sessão de revisão, uma edição direta de `exited_to` foi aceita, logo o hook não bloqueou. Causa não confirmada (hook não carregado ou falha de lançamento). Claude Code só bloqueia em exit 2 | Wrapper portável, `onFailure: "block"`, `integration_hook.sh` como pré-requisito de release |
+| Ativação do hook | Configurado. Em uma sessão de Claude Code em 2026-10-29, uma edição direta de `exited_to` foi aceita, logo o hook não bloqueou. Causa não confirmada (hook não carregado ou falha de lançamento). Claude Code só bloqueia em exit 2 | Wrapper portável, `onFailure: "block"`, `integration_hook.sh` como pré-requisito de release |
 | Proteção de `main` | Sem branch protection, sem rulesets, PRs sem review. CI roda e passa, mas não é obrigatório | Check obrigatório e review de CODEOWNERS |
 | Governança da allowlist | O guard verifica contra a `allowed_signers` do checkout corrente; um PR pode matricular uma chave e assinar com ela; o CI só anota. `sign_gate.py --yes` dispensa o terminal | CI verifica contra a allowlist do commit base; mudança em `governance/` falha sem aprovação; remover `--yes` |
 | Escopo do conteúdo assinado | Só `gate.pack`, `gate.consents`, `gate.evidence_review` (por estágio). `decision_draft` e `risk_inputs` podem mudar após a assinatura | Hash do artefato inteiro menos campos de estado |
